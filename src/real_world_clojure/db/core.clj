@@ -8,10 +8,10 @@
             :dbname "real_world"
             :password "root"})
 
-(def ds (jdbc/with-options (jdbc/get-datasource pg-db) jdbc/snake-kebab-opts))
+(def ds (jdbc/with-options (jdbc/get-datasource pg-db) jdbc/unqualified-snake-kebab-opts))
 
 (defn transaction
   [body-fn]
-  (jdbc/with-transaction [tx ds]
-    (let [tx-wrapped (jdbc/with-options tx jdbc/snake-kebab-opts)]
+  (jdbc/with-transaction [tx d]
+    (let [tx-wrapped (jdbc/with-options tx jdbc/unqualified-snake-kebab-opts)]
       (body-fn tx-wrapped ds))))
