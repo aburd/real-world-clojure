@@ -31,6 +31,7 @@
 (def get-user-query ["SELECT email, token, username, bio, image 
                      FROM users 
                      JOIN profiles ON users.id = profiles.user_id"])
+
 (defn get-user
   [id]
   (jdbc/execute-one! ds get-user-query))
@@ -38,6 +39,14 @@
 (defn get-users
   []
   (jdbc/execute! ds get-user-query))
+
+(defn update-user
+  [user-id diff]
+  (sql/update! ds :users diff {:id user-id}))
+
+(defn update-profile
+  [profile diff]
+  (sql/update! ds :users diff {:id (:id profile)}))
 
 ; (get-users)
 ; (create-user-with-profile 
