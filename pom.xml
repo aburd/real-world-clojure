@@ -12,7 +12,7 @@
     <url>https://github.com/aburd/real-world-clojure</url>
     <connection>scm:git:git://github.com/aburd/real-world-clojure.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/aburd/real-world-clojure.git</developerConnection>
-    <tag>53621157940e3da72ae74bc308039d559eb374c3</tag>
+    <tag>a35cf6752257b9dff1358c840a1b70ed1527d9c3</tag>
   </scm>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -78,6 +78,11 @@
       <version>0.1.2</version>
     </dependency>
     <dependency>
+      <groupId>buddy</groupId>
+      <artifactId>buddy-hashers</artifactId>
+      <version>2.0.167</version>
+    </dependency>
+    <dependency>
       <groupId>c3p0</groupId>
       <artifactId>c3p0</artifactId>
       <version>0.9.1.2</version>
@@ -85,7 +90,8 @@
     <dependency>
       <groupId>org.clojure</groupId>
       <artifactId>java.jdbc</artifactId>
-      <version>0.2.3</version>
+      <version>0.7.12</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
@@ -96,6 +102,21 @@
       <groupId>cheshire</groupId>
       <artifactId>cheshire</artifactId>
       <version>4.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>migratus</groupId>
+      <artifactId>migratus</artifactId>
+      <version>1.5.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.3.3</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.seancorfield</groupId>
+      <artifactId>next.jdbc</artifactId>
+      <version>1.3.894</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>
