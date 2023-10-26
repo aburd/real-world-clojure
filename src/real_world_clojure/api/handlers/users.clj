@@ -1,5 +1,6 @@
 (ns real-world-clojure.api.handlers.users
   (:require [buddy.hashers :as hs]
+            [compojure.core :refer :all]
             [real-world-clojure.db.users :as db-users]))
 
 (defn create-user

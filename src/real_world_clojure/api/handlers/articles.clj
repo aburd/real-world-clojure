@@ -1,4 +1,4 @@
-(ns real-world-clojure.api.handlers.profiles
+(ns real-world-clojure.api.handlers.articles
   (:require [compojure.core :refer :all]))
 
 (defroutes api-routes-articles
