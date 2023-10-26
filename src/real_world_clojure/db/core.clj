@@ -12,6 +12,6 @@
 
 (defn transaction
   [body-fn]
-  (jdbc/with-transaction [tx d]
+  (jdbc/with-transaction [tx ds]
     (let [tx-wrapped (jdbc/with-options tx jdbc/unqualified-snake-kebab-opts)]
       (body-fn tx-wrapped ds))))

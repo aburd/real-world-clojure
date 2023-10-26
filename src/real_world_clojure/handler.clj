@@ -3,56 +3,27 @@
             [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-            [ring.middleware.json :as middleware]))
+            [ring.middleware.json :as middleware]
+            [real-world-clojure.api.handlers.articles :refer [api-routes-articles]]
+            [real-world-clojure.api.handlers.profiles :refer [api-routes-profiles]]
+            [real-world-clojure.api.handlers.tags :refer [api-routes-tags]]
+            [real-world-clojure.api.handlers.user :refer [api-routes-user]]
+            [real-world-clojure.api.handlers.users :refer [api-routes-users]]))
 
 (defroutes app-routes
   (GET "/" [] "Hello World")
   (context 
     "/api" 
     [] 
-    (context
-      "/articles"
-      []
-      (defroutes api-articles-routes
-        (GET "/" [] "listing articles")
-        (POST "/" [] "creating article")
-        (GET "/:slug" [] "getting article by slug")
-        (PUT "/:slug" [] "updating article by slug")
-        (DELETE "/:slug" [] "updating article by slug")
-        (GET "/:slug/comments" [] "gettings comment on article")
-        (POST "/:slug/comments" [] "adding comment to article")
-        (DELETE "/:slug/comments/:id" [] "deleting comment from article")
-        (POST "/:slug/favorite" [] "favoriting article")
-        (DELETE "/:slug/favorite" [] "unfavoriting article")
-        (GET "/feed" [] "feed articles")))
-    (context
-      "/profiles"
-      []
-      (defroutes api-profiles-routes
-        (GET "/:username" [req] "getting profile with username")
-        (POST "/:username/follow" [] "following user")
-        (DELETE "/:username/follow" [] "unfollowing user")))
-    (context
-      "/tags"
-      []
-      (defroutes api-tags-routes
-        (GET "/" [] "getting tags")))
-    (context
-      "/user"
-      []
-      (defroutes api-user-routes
-        (GET "/" [] "get current user")
-        (PUT "/" [] "update user")))
-    (context 
-      "/users" 
-      [] 
-      (defroutes api-users-routes
-        (POST "/" [] "registration")
-        (POST "/login" [] "logging in"))))
+    (context "/articles" [] api-routes-articles)
+    (context "/profiles" [] api-routes-profiles)
+    (context "/tags" [] api-routes-tags)
+    (context "/user" [] api-routes-user)
+    (context "/users" [] api-routes-users)) 
   (route/not-found "Not Found"))
 
 (def app
-  (-> 
-    (handler/api (wrap-defaults app-routes site-defaults))
+  (-> (wrap-defaults app-routes site-defaults)
+    handler/api
     middleware/wrap-json-body
     middleware/wrap-json-response))

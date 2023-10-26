@@ -28,17 +28,21 @@
             p (assoc profile :user-id (:id user-record))]
         (create-profile p tx)))))
 
-(def get-user-query ["SELECT email, token, username, bio, image 
-                     FROM users 
-                     JOIN profiles ON users.id = profiles.user_id"])
-
 (defn get-user
   [id]
-  (jdbc/execute-one! ds get-user-query))
+  (jdbc/execute-one! ds ["SELECT email, token, username, bio, image
+                         FROM users
+                         JOIN profiles ON users.id = profiles.user_id
+                         WHERE users.id = ?"
+                         id]))
 
-(defn get-users
-  []
-  (jdbc/execute! ds get-user-query))
+(defn get-profile
+  [username]
+  (jdbc/execute-one! ds ["SELECT email, token, username, bio, image
+                         FROM users
+                         JOIN profiles ON users.id = profiles.user_id
+                         WHERE profiles.username = ?"
+                         username]))
 
 (defn update-user
   [user-id diff]
