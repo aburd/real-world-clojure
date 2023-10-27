@@ -1,22 +1,26 @@
 (ns real-world-clojure.api.handlers.users
   (:require [buddy.hashers :as hs]
             [compojure.core :refer :all]
-            [real-world-clojure.db.users :as db-users]))
+            [real-world-clojure.db.users :as db-users]
+            [real-world-clojure.api.responses :refer [ok]]))
 
-(defn create-user
-  [ds user]
-  (hs/encrypt (:password user)))
+(defn create-user-from-params
+  [{:keys [username password email]}]
+  (let [password-hash (hs/encrypt password)]
+    (db-users/create-user-with-profile
+      {:email email :password-hash password-hash :token "implement-me"}
+      {:username username})))
 
-(defn get-user
-  [req] 
-  (db-users/get-user))
-
-(defn update-user 
-  [req] 
-  (db-users/get-user))
+(defn handle-registration
+  [{{:keys [user]} :body}]
+  (println "USER::::"  user)
+  (let [user (or 
+               (db-users/get-user-by-email (:email user))
+               (create-user-from-params user))]
+    (ok user)))
 
 (defroutes api-routes-users
-  (POST "/" [] "registration")
+  (POST "/" [] handle-registration)
   (POST "/login" [] "logging in"))
 
 ; (db-users/get-user 63)

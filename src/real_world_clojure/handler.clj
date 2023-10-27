@@ -23,7 +23,8 @@
   (route/not-found "Not Found"))
 
 (def app
-  (-> (wrap-defaults app-routes site-defaults)
+  (-> app-routes
     handler/api
-    middleware/wrap-json-body
+    (wrap-defaults (assoc site-defaults :security {:anti-forgery false}))
+    (middleware/wrap-json-body {:keywords? true})
     middleware/wrap-json-response))

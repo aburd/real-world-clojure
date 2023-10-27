@@ -36,6 +36,14 @@
                          WHERE users.id = ?"
                          id]))
 
+(defn get-user-by-email
+  [email]
+  (jdbc/execute-one! ds ["SELECT email, token, username, bio, image
+                         FROM users
+                         JOIN profiles ON users.id = profiles.user_id
+                         WHERE users.email = ?"
+                         email]))
+
 (defn get-profile
   [username]
   (jdbc/execute-one! ds ["SELECT email, token, username, bio, image

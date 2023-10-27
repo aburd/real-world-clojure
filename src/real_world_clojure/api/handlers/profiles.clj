@@ -4,8 +4,8 @@
             [real-world-clojure.db.users :as db-users]))
 
 (defn get-profile
-  [{:keys [params]}]
-  (let [profile (db-users/get-profile (:username params))]
+  [{{:keys [username]} :params}]
+  (let [profile (db-users/get-profile username)]
     (if profile 
       {:status 200 :body profile})))
 
