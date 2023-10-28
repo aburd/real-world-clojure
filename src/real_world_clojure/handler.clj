@@ -25,14 +25,13 @@
 
 (defn wrap-auth
   [{:keys [headers] :as req}]
-  (println "headers" headers)
   req)
 
 (def app
   (-> app-routes
     handler/api
-    wrap-auth
-    (wrap-defaults (assoc site-defaults :security {:anti-forgery false}))
     (middleware/wrap-json-body {:keywords? true})
     middleware/wrap-json-response
+    (wrap-defaults (assoc site-defaults :security {:anti-forgery false}))
+    wrap-auth
     wrap-reload))
