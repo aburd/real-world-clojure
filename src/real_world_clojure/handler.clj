@@ -4,6 +4,7 @@
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
             [ring.middleware.json :as middleware]
+            [ring.middleware.reload :refer [wrap-reload]]
             [real-world-clojure.api.handlers.articles :refer [api-routes-articles]]
             [real-world-clojure.api.handlers.profiles :refer [api-routes-profiles]]
             [real-world-clojure.api.handlers.tags :refer [api-routes-tags]]
@@ -22,9 +23,16 @@
     (context "/users" [] api-routes-users)) 
   (route/not-found "Not Found"))
 
+(defn wrap-auth
+  [{:keys [headers] :as req}]
+  (println "headers" headers)
+  req)
+
 (def app
   (-> app-routes
     handler/api
+    wrap-auth
     (wrap-defaults (assoc site-defaults :security {:anti-forgery false}))
     (middleware/wrap-json-body {:keywords? true})
-    middleware/wrap-json-response))
+    middleware/wrap-json-response
+    wrap-reload))

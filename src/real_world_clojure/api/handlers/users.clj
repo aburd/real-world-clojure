@@ -2,7 +2,7 @@
   (:require [buddy.hashers :as hs]
             [compojure.core :refer :all]
             [real-world-clojure.db.users :as db-users]
-            [real-world-clojure.api.responses :refer [ok]]))
+            [real-world-clojure.api.responses :refer [ok forbidden]]))
 
 (defn create-user-from-params
   [{:keys [username password email]}]
@@ -19,9 +19,18 @@
                (create-user-from-params user))]
     (ok user)))
 
+(defn handle-login
+  [{{{:keys [email password]} :user} :body}]
+  (let [user (db-users/get-full-user-by-email email)]
+    (if user
+      (if (hs/check password (:password-hash user))
+        (ok (dissoc user :password-hash))
+        (forbidden))
+      (forbidden))))
+
 (defroutes api-routes-users
   (POST "/" [] handle-registration)
-  (POST "/login" [] "logging in"))
+  (POST "/login" [] handle-login))
 
 ; (db-users/get-user 63)
 

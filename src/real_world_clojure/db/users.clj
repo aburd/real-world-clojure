@@ -7,13 +7,12 @@
 
 (defn sanitize-user
   [user]
-  (dissoc user :password-hash))
+  (dissoc user :password-hash :id))
 
 (defn create-user
   ([user] (create-user user ds))
   ([user ds]
-   (let [record (sql/insert! ds :users user {:return-keys true})]
-     (sanitize-user record))))
+   (sql/insert! ds :users user {:return-keys true})))
 
 (defn create-profile
   ([profile] (create-profile profile ds))
@@ -25,6 +24,7 @@
   (transaction 
     (fn [tx ds]
       (let [user-record (create-user user tx)
+            test (println "user-record" user-record)
             p (assoc profile :user-id (:id user-record))]
         (create-profile p tx)))))
 
@@ -35,6 +35,14 @@
                          JOIN profiles ON users.id = profiles.user_id
                          WHERE users.id = ?"
                          id]))
+
+(defn get-full-user-by-email
+  [email]
+  (jdbc/execute-one! ds ["SELECT users.id, password_hash, email, token, username, bio, image
+                         FROM users
+                         JOIN profiles ON users.id = profiles.user_id
+                         WHERE users.email = ?"
+                         email]))
 
 (defn get-user-by-email
   [email]
