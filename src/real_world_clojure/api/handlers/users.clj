@@ -20,10 +20,12 @@
     (ok user)))
 
 (defn handle-login
-  [{{credentials :user} :body}]
+  [{{credentials :user auth-config :auth-config} :body}]
   (let [user (auth/auth-user credentials)]
     (if user
-      (ok user)
+      (do
+        (db-users/update-user (:id user) {:token (auth/create-auth-token credentials auth-config)})
+        (ok (db-users/get-user (:id user))))
       (forbidden))))
 
 (defroutes api-routes-users

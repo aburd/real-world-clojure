@@ -24,7 +24,6 @@
   (transaction 
     (fn [tx ds]
       (let [user-record (create-user user tx)
-            test (println "user-record" user-record)
             p (assoc profile :user-id (:id user-record))]
         (create-profile p tx)))))
 
