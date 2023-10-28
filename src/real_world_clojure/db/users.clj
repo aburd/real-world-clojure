@@ -43,6 +43,14 @@
                          WHERE users.email = ?"
                          email]))
 
+(defn get-profile-id
+  [user-id]
+  (jdbc/execute-one! ds ["SELECT profiles.id
+                         FROM users
+                         JOIN profiles ON users.id = profiles.user_id
+                         WHERE users.id = ?"
+                         user-id]))
+
 (defn get-user-by-email
   [email]
   (jdbc/execute-one! ds ["SELECT email, token, username, bio, image
@@ -61,11 +69,12 @@
 
 (defn update-user
   [user-id diff]
-  (sql/update! ds :users diff {:id user-id}))
+  (sql/update! ds :users diff {:id user-id} {:return-keys true}))
 
 (defn update-profile
-  [profile diff]
-  (sql/update! ds :users diff {:id (:id profile)}))
+  [user-id diff]
+  (let [profile-id (:id (get-profile-id user-id))]
+    (sql/update! ds :profiles diff {:id profile-id})))
 
 ; (get-users)
 ; (create-user-with-profile 
