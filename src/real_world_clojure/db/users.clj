@@ -1,9 +1,10 @@
 (ns real-world-clojure.db.users
   (:require 
-    [real-world-clojure.db.core :refer [ds transaction]]
     [buddy.hashers :as hs]
     [next.jdbc :as jdbc]
-    [next.jdbc.sql :as sql]))
+    [next.jdbc.sql :as sql]
+    [real-world-clojure.db.core :refer [ds transaction]]
+    [real-world-clojure.utils.map :as map-utils]))
 
 (defn sanitize-user
   [user]
@@ -75,6 +76,18 @@
   [user-id diff]
   (let [profile-id (:id (get-profile-id user-id))]
     (sql/update! ds :profiles diff {:id profile-id})))
+
+(defn update-user-and-profile
+  [user-id {:keys [email username password image bio]}]
+  (let [user-update (map-utils/filter-nil {:email email})
+        profile-update (map-utils/filter-nil {:username username :image image :bio bio})]
+    (when (some? password)
+      (update-user user-id {:password-hash (hs/encrypt password)}))
+    (when (not (empty? user-update))
+      (update-user user-id user-update))
+    (when (not (empty? profile-update))
+      (update-profile user-id profile-update))
+    (get-user user-id)))
 
 ; (get-users)
 ; (create-user-with-profile 

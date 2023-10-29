@@ -19,18 +19,7 @@
 (defn handle-update-user 
   [{:keys [user body] :as req}] 
   (if user
-    (let [user-id (get user "id")
-          {:keys [email username password image bio]} (:user body)
-          user-update (filter-nil {:email email})
-          profile-update (filter-nil {:username username :image image :bio bio})]
-      (ok (do
-            (when (some? password)
-              (db-users/update-user user-id {:password-hash (hs/encrypt password)}))
-            (when (not (empty? user-update))
-              (db-users/update-user user-id user-update))
-            (when (not (empty? profile-update))
-              (db-users/update-profile user-id profile-update))
-            (db-users/get-user user-id))))
+    (ok (db-users/update-user-and-profile (get user "id") (:user body)))
     (forbidden)))
 
 (defroutes api-routes-user
