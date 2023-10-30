@@ -13,11 +13,14 @@
       {:username username})))
 
 (defn handle-registration
-  [{{:keys [user]} :body}]
-  (let [user (or 
-               (db-users/get-user-by-email (:email user))
-               (create-user-from-params user))]
-    (ok user)))
+  [{{:keys [user]} :body :keys [auth-config]}]
+  (let [{:keys [email password]} user
+        user (or 
+               (db-users/get-user-by-email email)
+               (create-user-from-params user)) 
+        credentials {:email email :password password}
+        token (db-users/update-user (:user-id user) {:token (auth/create-auth-token credentials auth-config)})]
+    (ok (db-users/get-user (:user-id user)))))
 
 (defn handle-login
   [{{credentials :user auth-config :auth-config} :body}]
