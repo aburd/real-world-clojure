@@ -7,17 +7,15 @@
     [real-world-clojure.utils.map :as map-utils]
     [real-world-clojure.db.follows :refer [is-following?]]))
 
-(do
-  (defn get-profile
-    [username follower-id]
-    (jdbc/execute-one! ds ["SELECT username, bio, image, COUNT(follows.id) as following
-                           FROM users
-                           JOIN profiles 
-                             ON users.id = profiles.user_id
-                           WHERE profiles.username = ?"
-                           follower-id
-                           username]))
-  (get-profile "lol-aaron" 13))
+(defn get-profile
+  [username follower-id]
+  (jdbc/execute-one! ds ["SELECT username, bio, image, COUNT(follows.id) as following
+                         FROM users
+                         JOIN profiles 
+                           ON users.id = profiles.user_id
+                         WHERE profiles.username = ?"
+                         follower-id
+                         username]))
 
 
 (defn get-profile-id

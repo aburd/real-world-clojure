@@ -29,13 +29,15 @@
       (t-coerce/to-epoch)))
 
 (defn create-auth-token
-  [credentials auth-conf]
+  [credentials auth-config]
   (let [user (auth-user credentials)]
     (when (some? user)
-      (jws/sign 
-        (json/write-str user)
-        (pkey {:privkey "keys/auth_privkey.pem" :passphrase "password"}) 
-        {:alg :rs256 :exp (expiration)}))))
+      (let [token (jws/sign 
+                    (json/write-str {:email (:email user)})
+                    (pkey auth-config) 
+                    {:alg :rs256 :exp (expiration)})]
+        (db-users/update-user (:id user) {:token token})
+        token))))
 
 (defn decode-auth-token
   [token auth-config]
@@ -46,7 +48,6 @@
 
 (defn extract-auth-user 
   [auth-header auth-config]
-  (println "auth-config: " auth-config)
   (when (some? auth-header)
     (let [token (last (split auth-header #" "))]
       (try

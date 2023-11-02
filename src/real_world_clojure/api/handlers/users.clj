@@ -9,25 +9,26 @@
   [{:keys [username password email]}]
   (let [password-hash (hs/encrypt password)]
     (db-users/create-user-with-profile
-      {:email email :password-hash password-hash :token "implement-me"}
+      {:email email :password-hash password-hash}
       {:username username})))
 
 (defn handle-registration
   [{{:keys [user]} :body :keys [auth-config]}]
   (let [{:keys [email password]} user
-        user (or 
-               (db-users/get-user-by-email email)
-               (create-user-from-params user)) 
-        credentials {:email email :password password}
-        token (db-users/update-user (:user-id user) {:token (auth/create-auth-token credentials auth-config)})]
-    (ok (db-users/get-user (:user-id user)))))
+        existing-user (db-users/get-user-by-email email)]
+    (if (some? existing-user)
+      (ok existing-user)
+      (let [new-user (create-user-from-params user)
+            credentials {:email email :password password}
+            token (auth/create-auth-token credentials auth-config)]
+        (ok (db-users/get-user-by-email (:email new-user)))))))
 
 (defn handle-login
-  [{{credentials :user auth-config :auth-config} :body}]
+  [{{credentials :user} :body auth-config :auth-config}]
   (let [user (auth/auth-user credentials)]
     (if user
       (do
-        (db-users/update-user (:id user) {:token (auth/create-auth-token credentials auth-config)})
+        (auth/create-auth-token credentials auth-config)
         (ok (db-users/get-user (:id user))))
       (forbidden))))
 

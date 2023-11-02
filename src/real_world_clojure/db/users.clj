@@ -17,8 +17,9 @@
   (transaction 
     (fn [tx ds]
       (let [user-record (create-user user tx)
-            p (assoc profile :user-id (:id user-record))]
-        (create-profile p tx)))))
+            p (assoc profile :user-id (:id user-record))
+            profile (create-profile p tx)])))
+  (get-user-by-email (:email user)))
 
 (defn get-user
   [id]
@@ -47,7 +48,6 @@
 (defn update-user
   [user-id diff]
   (sql/update! ds :users diff {:id user-id} {:return-keys true}))
-
 
 (defn update-user-and-profile
   [user-id {:keys [email username password image bio]}]

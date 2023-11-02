@@ -10,12 +10,6 @@
     (ok (db-users/get-user (get user "id")))
     (not-found)))
 
-(defn filter-nil
-  [record]
-  (select-keys 
-    record 
-    (for [[k v] record :when (not (nil? v))] k)))
-
 (defn handle-update-user 
   [{:keys [user body] :as req}] 
   (if user
