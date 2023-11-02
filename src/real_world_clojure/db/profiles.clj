@@ -4,8 +4,7 @@
     [next.jdbc :as jdbc]
     [next.jdbc.sql :as sql]
     [real-world-clojure.db.core :refer [ds transaction]]
-    [real-world-clojure.utils.map :as map-utils]
-    [real-world-clojure.db.follows :refer [is-following?]]))
+    [real-world-clojure.utils.map :as map-utils]))
 
 (defn get-profile
   [username follower-id]
@@ -21,7 +20,6 @@
                          follower-id
                          username]))
 
-
 (defn get-profile-id
   [user-id]
   (jdbc/execute-one! ds ["SELECT profiles.id
@@ -29,6 +27,14 @@
                          JOIN profiles ON users.id = profiles.user_id
                          WHERE users.id = ?"
                          user-id]))
+
+(defn get-profile-id-by-username
+  [username]
+  (let [record (jdbc/execute-one! ds ["SELECT id
+                                       FROM profiles
+                                       WHERE username = ?"
+                                      username])]
+    (when (some? record) (:id record))))
 
 (defn update-profile
   [user-id diff]
