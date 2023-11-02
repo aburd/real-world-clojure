@@ -7,13 +7,14 @@
 (defn handle-get-user
   [{:keys [authorized? user headers]}] 
   (if authorized?
-    (ok (db-users/get-user (get user "id")))
+    (ok (db-users/get-user (:id user)))
     (not-found)))
 
 (defn handle-update-user 
   [{:keys [user body] :as req}] 
+  (println :user user)
   (if user
-    (ok (db-users/update-user-and-profile (get user "id") (:user body)))
+    (ok (db-users/update-user-and-profile (:id user) (:user body)))
     (forbidden)))
 
 (defroutes api-routes-user

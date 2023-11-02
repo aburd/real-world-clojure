@@ -9,10 +9,14 @@
 
 (defn get-profile
   [username follower-id]
-  (jdbc/execute-one! ds ["SELECT username, bio, image, COUNT(follows.id) as following
-                         FROM users
-                         JOIN profiles 
-                           ON users.id = profiles.user_id
+  (jdbc/execute-one! ds ["SELECT username, bio, image, EXISTS(
+                          SELECT 1
+                          FROM follows
+                          WHERE follower_id = ? AND following_id = users.id
+                         ) as following
+                         FROM profiles
+                         JOIN users 
+                           ON users.id = user_id
                          WHERE profiles.username = ?"
                          follower-id
                          username]))

@@ -51,7 +51,8 @@
   (when (some? auth-header)
     (let [token (last (split auth-header #" "))]
       (try
-        (decode-auth-token token auth-config)
+        (let [user (decode-auth-token token auth-config)]
+          (db-users/get-full-user-by-email (get user "email")))
         (catch Exception e nil)))))
 
 ; (def auth-config {:pubkey "keys/auth_pubkey.pem" :privkey "keys/auth_privkey.pem" :passphrase "password"})
