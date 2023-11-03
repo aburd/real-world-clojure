@@ -19,7 +19,7 @@
 
 (defn auth-user
   [{:keys [email password] :as credentials}]
-  (let [user (db-users/get-full-user-by-email email)]
+  (let [user (db-users/get-user-by "email" email)]
     (when user
       (when (hs/check password (:password-hash user))
         (dissoc user :password-hash)))))
@@ -33,10 +33,10 @@
   (let [user (auth-user credentials)]
     (when (some? user)
       (let [token (jws/sign 
-                    (json/write-str {:email (:email user)})
+                    (json/write-str {:id (:user-id user)})
                     (pkey auth-config) 
                     {:alg :rs256 :exp (expiration)})]
-        (db-users/update-user (:id user) {:token token})
+        (db-users/update-user (:user-id user) {:token token})
         token))))
 
 (defn decode-auth-token
@@ -52,7 +52,8 @@
     (let [token (last (split auth-header #" "))]
       (try
         (let [user (decode-auth-token token auth-config)]
-          (db-users/get-full-user-by-email (get user "email")))
+          (println :user user)
+          (db-users/get-user-by "id" (get user "id")))
         (catch Exception e nil)))))
 
 ; (def auth-config {:pubkey "keys/auth_pubkey.pem" :privkey "keys/auth_privkey.pem" :passphrase "password"})

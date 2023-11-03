@@ -9,35 +9,27 @@
 
 (defn get-user
   [id]
-  (jdbc/execute-one! ds ["SELECT email, token, username, bio, image
+  (jdbc/execute-one! ds ["SELECT *
                          FROM users
                          JOIN profiles ON users.id = profiles.user_id
                          WHERE users.id = ?"
                          id]))
 
-(defn get-full-user-by-email
-  [email]
-  (jdbc/execute-one! ds ["SELECT users.id, password_hash, email, token, username, bio, image
+(defn get-user-by
+  [k v]
+  (jdbc/execute-one! ds [(format "SELECT *
                          FROM users
                          JOIN profiles ON users.id = profiles.user_id
-                         WHERE users.email = ?"
-                         email]))
+                         WHERE users.%s = ?" k)
+                         v]))
 
-(defn get-full-user-by-username
-  [username]
-  (jdbc/execute-one! ds ["SELECT users.id, password_hash, email, token, username, bio, image
+(defn get-user-by-username
+  [v]
+  (jdbc/execute-one! ds ["SELECT *
                          FROM users
                          JOIN profiles ON users.id = profiles.user_id
-                         WHERE username = ?"
-                         username]))
-
-(defn get-user-by-email
-  [email]
-  (jdbc/execute-one! ds ["SELECT email, token, username, bio, image
-                         FROM users
-                         JOIN profiles ON users.id = profiles.user_id
-                         WHERE users.email = ?"
-                         email]))
+                         WHERE profiles.username = ?"
+                         v]))
 
 (defn create-user
   ([user] (create-user user ds))
@@ -48,14 +40,15 @@
   [user profile]
   (transaction 
     (fn [tx ds]
-      (let [user-record (create-user user tx)
-            p (assoc profile :user-id (:id user-record))
+      (let [new-user (create-user user tx)
+            p (assoc profile :user-id (:id new-user))
             profile (create-profile p tx)])))
-  (get-user-by-email (:email user)))
+  (get-user-by "email" (:email user)))
 
 (defn update-user
   [user-id diff]
-  (sql/update! ds :users diff {:id user-id} {:return-keys true}))
+  (sql/update! ds :users diff {:id user-id})
+  (get-user user-id))
 
 (defn update-user-and-profile
   [user-id {:keys [email username password image bio]}]
