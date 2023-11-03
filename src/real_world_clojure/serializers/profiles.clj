@@ -1,5 +1,5 @@
 (ns real-world-clojure.serializers.profiles)
 
-(defn profile
-  [{:keys [username bio image following] :as record}]
-  {:user {:email email :token token :username username :bio bio :image image}})
+(defn one
+  [{:keys [email username bio image following] :as record}]
+  {:user {:email email :username username :bio bio :image image :following following}})

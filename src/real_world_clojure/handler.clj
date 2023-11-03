@@ -8,8 +8,7 @@
             [real-world-clojure.api.handlers.articles :refer [api-routes-articles]]
             [real-world-clojure.api.handlers.profiles :refer [api-routes-profiles]]
             [real-world-clojure.api.handlers.tags :refer [api-routes-tags]]
-            [real-world-clojure.api.handlers.user :refer [api-routes-user]]
-            [real-world-clojure.api.handlers.users :refer [api-routes-users]]
+            [real-world-clojure.api.handlers.users :refer [api-routes-users api-routes-user]]
             [real-world-clojure.api.auth :refer [extract-auth-user]]))
 
 (defroutes app-routes

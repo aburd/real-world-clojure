@@ -21,6 +21,8 @@
 !.vscode/extensions.json
 .history/*
 
+.clj-kondo
+.lsp
 
 #System Files
 .DS_Store

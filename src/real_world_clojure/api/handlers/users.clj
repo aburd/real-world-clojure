@@ -2,8 +2,8 @@
   (:require [buddy.hashers :as hs]
             [compojure.core :refer :all]
             [real-world-clojure.db.users :as db-users]
-            [real-world-clojure.serializers.users :as user-serializers]
-            [real-world-clojure.api.responses :refer [ok forbidden]]
+            [real-world-clojure.serializers.users :as s-users]
+            [real-world-clojure.api.responses :refer [ok forbidden not-found]]
             [real-world-clojure.api.auth :as auth]))
 
 (defn create-user-from-params
@@ -23,7 +23,7 @@
         new-user (if (some? existing-user)
                    existing-user
                    (create-user-from-params user auth-config))]
-    (ok (user-serializers/user new-user))))
+    (ok (s-users/one new-user))))
 
 (defn handle-login
   [{{credentials :user} :body auth-config :auth-config}]
@@ -31,12 +31,29 @@
     (if user
       (do
         (auth/create-auth-token credentials auth-config)
-        (ok (user-serializers/user (db-users/get-user (:user-id user)))))
+        (ok (s-users/one (db-users/get-user (:user-id user)))))
       (forbidden))))
+
+(defn handle-get-user
+  [{:keys [authorized? user headers]}] 
+  (if authorized?
+    (ok (s-users/one (db-users/get-user (:user-id user))))
+    (not-found)))
+
+(defn handle-update-user 
+  [{:keys [user body] :as req}] 
+  (println :user user)
+  (if user
+    (ok (s-users/one (db-users/update-user-and-profile (:user-id user) (:user body))))
+    (forbidden)))
 
 (defroutes api-routes-users
   (POST "/" [] handle-registration)
   (POST "/login" [] handle-login))
+
+(defroutes api-routes-user
+  (GET "/" [] handle-get-user)
+  (PUT "/" [] handle-update-user)) 
 
 ; (db-users/get-user 63)
 
