@@ -52,7 +52,6 @@
     (let [token (last (split auth-header #" "))]
       (try
         (let [user (decode-auth-token token auth-config)]
-          (println :user user)
           (db-users/get-user-by "id" (get user "id")))
         (catch Exception e nil)))))
 

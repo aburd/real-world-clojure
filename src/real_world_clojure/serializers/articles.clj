@@ -7,8 +7,8 @@
    :description
    :body
    :tagList
-   :createdAt
-   :updatedAt
+   :created-at
+   :updated-at
    :favorited
    :favoritesCount])
 

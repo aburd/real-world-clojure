@@ -42,7 +42,6 @@
 
 (defn handle-update-user
   [{:keys [user body] :as req}]
-  (println :user user)
   (if user
     (ok (s-users/one (db-users/update-user-and-profile (:user-id user) (:user body))))
     (forbidden)))

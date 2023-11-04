@@ -46,7 +46,6 @@
   [user-id diff]
   (let [profile (get-profile-by-user-id user-id)]
     (when (some? profile)
-      (println :profile profile)
       (sql/update! ds :profiles diff {:id (:id profile)}))))
 
 (defn create-profile
