@@ -1,17 +1,17 @@
 (ns real-world-clojure.db.follows
-  (:require 
-    [next.jdbc :as jdbc]
-    [next.jdbc.sql :as sql]
-    [real-world-clojure.db.core :refer [ds transaction]]))
+  (:require
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :as sql]
+   [real-world-clojure.db.core :refer [ds transaction]]))
 
 (defn is-following?
   [follower-id following-id]
-  (boolean 
-    (jdbc/execute-one! ds ["SELECT id
+  (boolean
+   (jdbc/execute-one! ds ["SELECT id
                            FROM follows
                            WHERE follower_id = ? AND following_id = ?"
-                           follower-id
-                           following-id])))
+                          follower-id
+                          following-id])))
 
 (defn upsert-follow
   [follower-id following-id]

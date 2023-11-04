@@ -1,6 +1,6 @@
 (ns real-world-clojure.db.core
-   (:require 
-     [next.jdbc :as jdbc]))
+  (:require
+   [next.jdbc :as jdbc]))
 
 (def pg-db {:dbtype "postgresql"
             :port 5433

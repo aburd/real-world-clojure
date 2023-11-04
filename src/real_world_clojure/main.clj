@@ -8,6 +8,6 @@
             :dbname "real_world"
             :password "root"})
 
-(defn db 
+(defn db
   []
   (j/query pg-db ["SELECT current_database()"]))

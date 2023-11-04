@@ -10,8 +10,8 @@
   [{:keys [username password email]} auth-config]
   (let [password-hash (hs/encrypt password)
         user (db-users/create-user-with-profile
-               {:email email :password-hash password-hash}
-               {:username username})
+              {:email email :password-hash password-hash}
+              {:username username})
         credentials {:email email :password password}
         token (auth/create-auth-token credentials auth-config)]
     (assoc user :token token)))
@@ -35,13 +35,13 @@
       (forbidden))))
 
 (defn handle-get-user
-  [{:keys [authorized? user headers]}] 
+  [{:keys [authorized? user headers]}]
   (if authorized?
     (ok (s-users/one (db-users/get-user (:user-id user))))
     (not-found)))
 
-(defn handle-update-user 
-  [{:keys [user body] :as req}] 
+(defn handle-update-user
+  [{:keys [user body] :as req}]
   (println :user user)
   (if user
     (ok (s-users/one (db-users/update-user-and-profile (:user-id user) (:user body))))
@@ -53,7 +53,7 @@
 
 (defroutes api-routes-user
   (GET "/" [] handle-get-user)
-  (PUT "/" [] handle-update-user)) 
+  (PUT "/" [] handle-update-user))
 
 ; (db-users/get-user 63)
 

@@ -9,11 +9,11 @@
             [clojure.data.json :as json]
             [clojure.string :refer [split]]))
 
-(defn- pkey 
+(defn- pkey
   [{:keys [privkey passphrase] :as auth-config}]
   (ks/private-key (io/resource privkey) passphrase))
 
-(defn- pubkey 
+(defn- pubkey
   [{:keys [pubkey] :as auth-config}]
   (ks/public-key (io/resource pubkey)))
 
@@ -32,10 +32,10 @@
   [credentials auth-config]
   (let [user (auth-user credentials)]
     (when (some? user)
-      (let [token (jws/sign 
-                    (json/write-str {:id (:user-id user)})
-                    (pkey auth-config) 
-                    {:alg :rs256 :exp (expiration)})]
+      (let [token (jws/sign
+                   (json/write-str {:id (:user-id user)})
+                   (pkey auth-config)
+                   {:alg :rs256 :exp (expiration)})]
         (db-users/update-user (:user-id user) {:token token})
         token))))
 
@@ -46,7 +46,7 @@
        (apply str)
        json/read-str))
 
-(defn extract-auth-user 
+(defn extract-auth-user
   [auth-header auth-config]
   (when (some? auth-header)
     (let [token (last (split auth-header #" "))]

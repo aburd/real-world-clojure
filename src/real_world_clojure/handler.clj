@@ -13,28 +13,28 @@
 
 (defroutes app-routes
   (GET "/" [] "Hello World")
-  (context 
-    "/api" 
-    [] 
+  (context
+    "/api"
+    []
     (context "/articles" [] api-routes-articles)
     (context "/profiles" [] api-routes-profiles)
     (context "/tags" [] api-routes-tags)
     (context "/user" [] api-routes-user)
-    (context "/users" [] api-routes-users)) 
+    (context "/users" [] api-routes-users))
   (route/not-found "Not Found"))
 
 (defn wrap-auth [handler]
   (fn [{:keys [headers auth-config] :as req}]
     (let [auth-header (get headers "authorization")
           user (extract-auth-user auth-header auth-config)]
-      (handler (if (some? user) 
+      (handler (if (some? user)
                  (assoc req :authorized? true :user user)
                  (assoc req :authorized? false :user nil))))))
 
 (defn wrap-config [handler]
   (fn [req]
-    (handler (assoc req :auth-config {:privkey "keys/auth_privkey.pem" 
-                                      :pubkey "keys/auth_pubkey.pem" 
+    (handler (assoc req :auth-config {:privkey "keys/auth_privkey.pem"
+                                      :pubkey "keys/auth_pubkey.pem"
                                       :passphrase "password"}))))
 
 (def app

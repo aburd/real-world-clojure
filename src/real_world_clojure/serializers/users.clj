@@ -1,8 +1,11 @@
 (ns real-world-clojure.serializers.users)
 
+(defn inner [record]
+  (select-keys record [:email :token :username :bio :image]))
+
 (defn one
-  [{:keys [email token username bio image] :as record}]
-  {:user {:email email :token token :username username :bio bio :image image}})
+  [record]
+  {:user (inner record)})
 
 (defn many
   [users]

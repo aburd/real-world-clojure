@@ -1,11 +1,11 @@
 (ns real-world-clojure.db.users
-  (:require 
-    [buddy.hashers :as hs]
-    [next.jdbc :as jdbc]
-    [next.jdbc.sql :as sql]
-    [real-world-clojure.db.core :refer [ds transaction]]
-    [real-world-clojure.db.profiles :refer [create-profile update-profile]]
-    [real-world-clojure.utils.map :as map-utils]))
+  (:require
+   [buddy.hashers :as hs]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :as sql]
+   [real-world-clojure.db.core :refer [ds transaction]]
+   [real-world-clojure.db.profiles :refer [create-profile update-profile]]
+   [real-world-clojure.utils.map :as map-utils]))
 
 (defn get-user
   [id]
@@ -38,11 +38,11 @@
 
 (defn create-user-with-profile
   [user profile]
-  (transaction 
-    (fn [tx ds]
-      (let [new-user (create-user user tx)
-            p (assoc profile :user-id (:id new-user))
-            profile (create-profile p tx)])))
+  (transaction
+   (fn [tx ds]
+     (let [new-user (create-user user tx)
+           p (assoc profile :user-id (:id new-user))
+           profile (create-profile p tx)])))
   (get-user-by "email" (:email user)))
 
 (defn update-user

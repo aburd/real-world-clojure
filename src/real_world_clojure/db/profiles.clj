@@ -1,10 +1,10 @@
 (ns real-world-clojure.db.profiles
-  (:require 
-    [buddy.hashers :as hs]
-    [next.jdbc :as jdbc]
-    [next.jdbc.sql :as sql]
-    [real-world-clojure.db.core :refer [ds transaction]]
-    [real-world-clojure.utils.map :as map-utils]))
+  (:require
+   [buddy.hashers :as hs]
+   [next.jdbc :as jdbc]
+   [next.jdbc.sql :as sql]
+   [real-world-clojure.db.core :refer [ds transaction]]
+   [real-world-clojure.utils.map :as map-utils]))
 
 (defn get-profile-by
   [k v follower-id & {:keys [table] :or {table "profiles"}}]
@@ -35,12 +35,12 @@
 
 (defn get-profile-by-user-id
   [user-id]
-  (jdbc/execute-one! 
-    ds 
-    ["SELECT profiles.id
+  (jdbc/execute-one!
+   ds
+   ["SELECT profiles.id
      FROM profiles 
      JOIN users ON users.id = profiles.user_id 
-     WHERE users.id = ?" user-id])) 
+     WHERE users.id = ?" user-id]))
 
 (defn update-profile
   [user-id diff]

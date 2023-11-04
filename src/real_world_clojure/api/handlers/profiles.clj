@@ -9,27 +9,27 @@
 
 (defn get-profile
   [{{:keys [username]} :params user :user}]
-  (ok 
-    (s-profiles/one 
-      (db-profiles/get-profile-by "username" username (:user-id user)))))
+  (ok
+   (s-profiles/one
+    (db-profiles/get-profile-by "username" username (:user-id user)))))
 
 (defn follow-profile
   [{{:keys [username]} :params user :user}]
   (let [following-id (:id (db-users/get-user-by-username username))
         follower-id (:id (db-users/get-user-by-username (:username user)))]
     (db-follows/upsert-follow follower-id following-id)
-    (ok 
-      (s-profiles/one 
-        (db-profiles/get-profile-by "username" username (:user-id user))))))
+    (ok
+     (s-profiles/one
+      (db-profiles/get-profile-by "username" username (:user-id user))))))
 
 (defn unfollow-profile
   [{{:keys [username]} :params user :user}]
   (let [following-id (:id (db-users/get-user-by-username username))
         follower-id (:id (db-users/get-user-by-username (:username user)))]
     (db-follows/delete-follow follower-id following-id)
-    (ok 
-      (s-profiles/one
-        (db-profiles/get-profile-by "username" username (:user-id user))))))
+    (ok
+     (s-profiles/one
+      (db-profiles/get-profile-by "username" username (:user-id user))))))
 
 (defroutes api-routes-profiles
   (GET "/:username" [] get-profile)
