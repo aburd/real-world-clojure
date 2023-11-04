@@ -3,6 +3,7 @@
             [real-world-clojure.api.responses :refer [ok]]
             [real-world-clojure.db.articles :as db-articles]
             [real-world-clojure.db.profiles :as db-profiles]
+            [real-world-clojure.db.tags :as db-tags]
             [real-world-clojure.serializers.articles :as s-articles]))
 
 (defn list-articles
@@ -12,18 +13,24 @@
           favorited nil
           limit 20
           offset 0}}
-    :params :as req}] 
-  (ok (s-articles/many (db-articles/query-articles {:tag tag
-                                                    :author author
-                                                    :favorited favorited
-                                                    :limit limit
-                                                    :offset offset}))))
+    :params 
+    user :user
+    :as req}] 
+  (let [articles (db-articles/query-articles {:tag tag
+                                              :author author
+                                              :favorited favorited
+                                              :limit limit
+                                              :offset offset
+                                              :follower-id (:id user)})
+        article-ids (map :article-id articles)
+        tag-groups (map (partial db-tags/get-tags-by "article_id") article-ids)] 
+    (ok (s-articles/many (map vector articles tag-groups)))))
 
 (defn get-article-by-slug
   [{{:keys [slug]} :params user :user}]
-  (let [article (db-articles/get-article-by "slug" slug)
-        author (db-profiles/get-profile-by "id" (:author-id article) (:id user))]
-    (ok (s-articles/one article author))))
+  (let [article (db-articles/get-article-by "slug" slug (:id user))
+        tags (db-tags/get-tags-by "article_id" (:id article))]
+    (ok (s-articles/one article tags))))
     
 
 (defroutes api-routes-articles

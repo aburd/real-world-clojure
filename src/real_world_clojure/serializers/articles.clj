@@ -6,20 +6,21 @@
    :title
    :description
    :body
-   :tagList
    :created-at
    :updated-at
+   :tag-list
    :favorited
-   :favoritesCount])
+   :favorites-count])
 
-(defn inner [article-record author-record]
+(defn inner [article-record tag-records]
   (-> article-record
-                (select-keys article-shape)
-                (assoc :author (s-profiles/inner author-record))))
+      (select-keys article-shape)
+      (assoc :author (s-profiles/inner article-record))
+      (assoc :tag-list (map :label tag-records))))
 
 (defn one
-  [article-record author-record]
-  {:article (inner article-record author-record)})
+  [article-record tag-records]
+  {:article (inner article-record tag-records)})
 
 (defn many [record-tuples]
   {:articles (map (partial apply inner) record-tuples)})
