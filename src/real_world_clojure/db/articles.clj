@@ -6,12 +6,7 @@
    [real-world-clojure.utils.string :refer [sluggify]]))
 
 (defn query-articles
-  [& {:keys [tag author favorited limit offset]
-      :or {tag nil
-           author nil
-           favorited nil
-           limit 20
-           offset 0}}]
+  [& {:keys [tag author favorited limit offset]}]
   (let [args (vec (filter (comp not nil?) [author tag limit offset]))]
     (jdbc/execute! ds (vec (concat
                             [(format "SELECT * FROM articles %s %s LIMIT ? OFFSET ?"

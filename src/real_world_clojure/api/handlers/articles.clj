@@ -1,7 +1,9 @@
 (ns real-world-clojure.api.handlers.articles
   (:require [compojure.core :refer :all]
             [real-world-clojure.api.responses :refer [ok]]
-            [real-world-clojure.db.articles :as db-articles]))
+            [real-world-clojure.db.articles :as db-articles]
+            [real-world-clojure.db.profiles :as db-profiles]
+            [real-world-clojure.serializers.articles :as s-articles]))
 
 (defn list-articles
   [{{:keys [tag author favorited limit offset]
@@ -11,12 +13,23 @@
           limit 20
           offset 0}}
     :params :as req}] 
-  (ok {:tag tag :author author :fav favorited :lim limit :off offset}))
+  (ok (s-articles/many (db-articles/query-articles {:tag tag
+                                                    :author author
+                                                    :favorited favorited
+                                                    :limit limit
+                                                    :offset offset}))))
+
+(defn get-article-by-slug
+  [{{:keys [slug]} :params user :user}]
+  (let [article (db-articles/get-article-by "slug" slug)
+        author (db-profiles/get-profile-by "id" (:author-id article) (:id user))]
+    (ok (s-articles/one article author))))
+    
 
 (defroutes api-routes-articles
   (GET "/" [] list-articles)
   (POST "/" [] "creating article")
-  (GET "/:slug" [] "getting article by slug")
+  (GET "/:slug" [] get-article-by-slug)
   (PUT "/:slug" [] "updating article by slug")
   (DELETE "/:slug" [] "updating article by slug")
   (GET "/:slug/comments" [] "gettings comment on article")
