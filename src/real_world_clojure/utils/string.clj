@@ -6,3 +6,5 @@
   (-> title
       (s/replace #"\s" "-")
       s/lower-case))
+
+(defn non-zero-s? [s] (-> s count pos?))
