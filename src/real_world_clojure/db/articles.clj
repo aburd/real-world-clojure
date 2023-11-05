@@ -9,7 +9,7 @@
 (def favorited-sql "EXISTS(
                      SELECT 1
                      FROM favorite_articles
-                     WHERE profile_id = profiles.id AND article_id = articles.id
+                     WHERE profile_id = ? AND article_id = articles.id
                     ) as favorited")
 
 (def favorite-count-sql "(SELECT COUNT(*)
@@ -27,14 +27,14 @@
   [user-id]
   (let [selects (vec (filter some? ["*" 
                                     "articles.id as article_id" 
-                                    favorited-sql 
                                     favorite-count-sql 
+                                    (if (some? user-id) favorited-sql nil) 
                                     (if (some? user-id) following-sql nil)]))]
     (str "SELECT " (join ",\n" selects))))
 
 (defn query-articles
   [{:keys [tag author favorited limit offset user-id]}]
-  (let [args (vec (filter (comp not nil?) [user-id author tag limit offset]))
+  (let [args (vec (filter (comp not nil?) [user-id user-id author tag limit offset]))
         sql-statement (format "%s
                               FROM articles 
                               JOIN profiles ON profiles.id = author_id
