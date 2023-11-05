@@ -31,17 +31,36 @@
   (let [article (db-articles/get-article-by "slug" slug (:id user))
         tags (db-tags/get-tags-by "article_id" (:id article))]
     (ok (s-articles/one article tags))))
-    
 
+(defn create-article
+  [{{:keys [article]} :body user :user}]
+  (let [{:keys [title description body tagList]} article
+        user-id (:id user)
+        record (db-articles/create-article 
+                 user-id
+                 {:tags tagList :title title :description description :body body})
+        article (db-articles/get-article-by "id" (:id record) user-id)
+        tags (db-tags/get-tags-by "article_id" (:id article))]
+    (ok (s-articles/one article tags)))) 
+
+(defn favorite-article
+  [{{:keys [slug]} :params user :user}]
+  (let [user-id (:id user)
+        profile (db-profiles/get-profile-by-user-id user-id)
+        record (db-articles/favorite-article (:id profile) slug)
+        article (db-articles/get-article-by "slug" slug user-id)
+        tags (db-tags/get-tags-by "article_id" (:id article))]
+    (ok (s-articles/one article tags))))
+    
 (defroutes api-routes-articles
   (GET "/" [] list-articles)
-  (POST "/" [] "creating article")
+  (POST "/" [] create-article)
   (GET "/:slug" [] get-article-by-slug)
   (PUT "/:slug" [] "updating article by slug")
   (DELETE "/:slug" [] "updating article by slug")
   (GET "/:slug/comments" [] "gettings comment on article")
   (POST "/:slug/comments" [] "adding comment to article")
   (DELETE "/:slug/comments/:id" [] "deleting comment from article")
-  (POST "/:slug/favorite" [] "favoriting article")
+  (POST "/:slug/favorite" [] favorite-article)
   (DELETE "/:slug/favorite" [] "unfavoriting article")
   (GET "/feed" [] "feed articles"))
