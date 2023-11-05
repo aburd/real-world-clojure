@@ -9,7 +9,8 @@
 (def favorited-sql "EXISTS(
                      SELECT 1
                      FROM favorite_articles
-                     WHERE profile_id = ? AND article_id = articles.id
+                     JOIN users ON profiles.user_id = users.id
+                     WHERE users.id = ? AND article_id = articles.id
                     ) as favorited")
 
 (def favorite-count-sql "(SELECT COUNT(*)
@@ -63,9 +64,8 @@
                           WHERE articles.%s = ?"
                          (select-statement user-id)
                          k)]
-    (jdbc/execute-one! ds [sql-statement
-                           user-id
-                           v])))
+    (println sql-statement)
+    (jdbc/execute-one! ds (vec (concat [sql-statement] [user-id user-id v])))))
 
 (defn get-article-by-slug
   [slug]
