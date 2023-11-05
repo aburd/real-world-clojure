@@ -21,7 +21,7 @@
                                               :favorited favorited
                                               :limit limit
                                               :offset offset
-                                              :follower-id (:id user)})
+                                              :user-id (:id user)})
         article-ids (map :article-id articles)
         tag-groups (map (partial db-tags/get-tags-by "article_id") article-ids)] 
     (ok (s-articles/many (map vector articles tag-groups)))))

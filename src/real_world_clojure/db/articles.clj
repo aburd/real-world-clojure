@@ -6,9 +6,15 @@
    [real-world-clojure.utils.string :refer [sluggify]]))
 
 (defn query-articles
-  [{:keys [tag author favorited limit offset follower-id]}]
-  (let [args (vec (filter (comp not nil?) [follower-id author tag limit offset]))
-        sql-statement (format "SELECT articles.id as article_id, *
+  [{:keys [tag author favorited limit offset user-id]}]
+  (let [args (vec (filter (comp not nil?) [user-id author tag limit offset]))
+        sql-statement (format "SELECT 
+                                articles.id as article_id, *,
+                                EXISTS(
+                                 SELECT 1
+                                 FROM favorite_articles
+                                 WHERE profile_id = profiles.id AND article_id = articles.id
+                                ) as favorited
                                 %s
                               FROM articles 
                               JOIN profiles ON profiles.id = author_id
@@ -19,8 +25,8 @@
                                 %s %s %s 
                               %s 
                               %s"
-                         (if (some? follower-id) "
-                                 ,EXISTS(
+                         (if (some? user-id) "
+                                 , EXISTS(
                                   SELECT 1
                                   FROM follows
                                   WHERE follower_id = ? AND following_id = users.id
@@ -73,3 +79,7 @@
           tx
           :tags
           (map (fn [label] {:article-id article-id :label label}) tags)))))))
+
+(defn favorite-article
+  [profile-id article-id]
+  (sql/insert! ds :favorite-articles {:profile-id profile-id :article-id article-id}))
