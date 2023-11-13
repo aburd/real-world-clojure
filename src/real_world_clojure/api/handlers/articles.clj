@@ -1,6 +1,7 @@
 (ns real-world-clojure.api.handlers.articles
   (:require [compojure.core :refer :all]
             [real-world-clojure.api.responses :refer [ok]]
+            [real-world-clojure.api.params :refer [to-int]]
             [real-world-clojure.api.handlers.validators.core :refer [validate parse-params]]
             [real-world-clojure.api.handlers.validators.articles]
             [real-world-clojure.db.articles :as db-articles]
@@ -56,8 +57,8 @@
     
 (defroutes api-routes-articles
   (GET "/" [] (validate 
-                (parse-params list-articles {:limit #(Integer/parseInt %)
-                                             :offset #(Integer/parseInt %)}) 
+                (parse-params list-articles {:limit to-int
+                                             :offset to-int}) 
                 {:params-key :articles/list-articles-params}))
   (POST "/" [] create-article)
   (GET "/:slug" [] get-article-by-slug)
