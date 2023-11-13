@@ -60,7 +60,9 @@
                 (parse-params list-articles {:limit to-int
                                              :offset to-int}) 
                 {:params-key :articles/list-articles-params}))
-  (POST "/" [] create-article)
+  (POST "/" [] (validate
+                 create-article
+                 {:body-key :articles/create-article-body}))
   (GET "/:slug" [] get-article-by-slug)
   (PUT "/:slug" [] "updating article by slug")
   (DELETE "/:slug" [] "updating article by slug")

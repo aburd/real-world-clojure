@@ -17,3 +17,8 @@
                                                        :articles/favorited
                                                        :common/limit
                                                        :common/offset]))
+
+(s/def :articles/create-article-body (s/keys :keys [:articles/title
+                                                    :articles/description
+                                                    :articles/body]
+                                             :opt [:articles/tagList]))
